@@ -8,6 +8,7 @@ import Avatar from '../components/Avatar';
 import GroupChat from '../components/GroupChat';
 import { storage } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { parsePdfWithAI, analyzeResults as analyzeResultsAI, moderateChat as moderateChatAI } from '../services/ai';
 
 export default function AdminDashboard() {
   const [tab, setTab] = useState('upload'); // upload, users, analytics, moderation
@@ -73,28 +74,12 @@ export default function AdminDashboard() {
     setParsedRows([]);
 
     try {
-      setUploadStage('uploading');
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/parse-pdf`, {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || 'Parse failed');
-      }
-
       setUploadStage('ai_formatting');
-      const data = await res.json();
+      const arrayBuffer = await file.arrayBuffer();
+      const acronyms = await parsePdfWithAI(arrayBuffer);
 
-      setPdfText(data.text || '');
-
-      // The backend now returns AI-parsed acronyms directly
-      if (data.acronyms && data.acronyms.length > 0) {
-        setParsedRows(data.acronyms);
+      if (acronyms && acronyms.length > 0) {
+        setParsedRows(acronyms);
         setUploadStage('done');
       } else {
         setUploadStage('');
@@ -103,7 +88,7 @@ export default function AdminDashboard() {
     } catch (err) {
       console.error('Error parsing PDF:', err);
       setUploadStage('');
-      alert(`Upload failed: ${err.message}. Make sure the backend is running (node backend/server.js).`);
+      alert(`Upload failed: ${err.message}`);
     }
     setUploading(false);
   }
@@ -151,7 +136,6 @@ export default function AdminDashboard() {
     setAiSummary('');
 
     try {
-      // Anonymize results
       const anonymized = results.map((r, i) => ({
         student: `Student_${i + 1}`,
         studyGroup: r.studyGroup,
@@ -161,18 +145,11 @@ export default function AdminDashboard() {
         timeUsed: r.timeUsed
       }));
 
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/analyze-results`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ results: anonymized })
-      });
-
-      if (!res.ok) throw new Error('AI analysis failed');
-      const data = await res.json();
-      setAiSummary(data.summary || 'No summary generated.');
+      const summary = await analyzeResultsAI(anonymized);
+      setAiSummary(summary || 'No summary generated.');
     } catch (err) {
       console.error('Error consulting Gemini:', err);
-      setAiSummary('Failed to get AI analysis. Is the backend running?');
+      setAiSummary('Failed to get AI analysis. Please try again.');
     }
     setAiLoading(false);
   }
@@ -481,19 +458,12 @@ export default function AdminDashboard() {
                         return;
                       }
 
-                      // Send to AI for moderation
-                      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/moderate-chat`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ messages: msgs })
-                      });
-
-                      if (!res.ok) throw new Error('Moderation request failed');
-                      const data = await res.json();
-                      setFlaggedMessages(data.flagged || []);
+                      // Send to AI for moderation (client-side)
+                      const flagged = await moderateChatAI(msgs);
+                      setFlaggedMessages(flagged);
 
                       // Save flags to Firestore
-                      for (const flag of (data.flagged || [])) {
+                      for (const flag of flagged) {
                         await addDoc(collection(db, 'chat_flags'), {
                           ...flag,
                           flaggedAt: serverTimestamp()
@@ -503,7 +473,7 @@ export default function AdminDashboard() {
                       setLastScanTime(new Date().toLocaleTimeString());
                     } catch (err) {
                       console.error('Moderation error:', err);
-                      alert('Moderation failed. Is the backend running?');
+                      alert('Moderation failed. Please try again.');
                     }
                     setModerating(false);
                   }}

@@ -236,7 +236,7 @@ export default function QuizPage() {
                   className="card-soft"
                 >
                   <h3 className="text-xl text-indigo-600 font-bold mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
-                    Q{idx + 1}. What is <span className="text-cosmic-blue">{q.acronym}</span>?
+                    Q{idx + 1}. What is <span style={{ color: '#5B21B6' }}>{q.acronym}</span>?
                   </h3>
 
                   {/* Breakdown selection */}

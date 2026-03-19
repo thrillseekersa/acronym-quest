@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getDailyAcronyms, getTodayString } from '../utils/dailyAcronyms';
 import { generateDistractors } from '../utils/distractors';
 import GroupChat from '../components/GroupChat';
+import { askAI as askAIService } from '../services/ai';
 import Avatar from '../components/Avatar';
 
 const STUDY_TIME = 5 * 60;   // 5 minutes study
@@ -238,22 +239,17 @@ export default function GamifiedDashboard() {
     setChatLoading(true);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/ask-ai`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question,
-          acronyms: dailyAcronyms.map(a => ({ acronym: a.acronym, breakdown: a.breakdown, meaning: a.meaning })),
-          chatHistory: chatMessages.slice(-6) // Last 6 messages for context
-        })
-      });
-
-      if (!res.ok) throw new Error('AI request failed');
-      const data = await res.json();
-      setChatMessages(prev => [...prev, { role: 'ai', text: data.answer }]);
+      const currentAcronym = dailyAcronyms[currentIndex] || dailyAcronyms[0];
+      const answer = await askAIService(
+        currentAcronym?.acronym || '',
+        currentAcronym?.breakdown || '',
+        currentAcronym?.meaning || '',
+        question
+      );
+      setChatMessages(prev => [...prev, { role: 'ai', text: answer }]);
     } catch (err) {
       console.error('AI chat error:', err);
-      setChatMessages(prev => [...prev, { role: 'ai', text: 'Oops! Could not reach the AI tutor. Make sure the backend is running. 🔧' }]);
+      setChatMessages(prev => [...prev, { role: 'ai', text: '✨ Oops! Could not reach the AI tutor. Please try again. 🔧' }]);
     }
     setChatLoading(false);
   }

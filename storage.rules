@@ -1,0 +1,11 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow public read/write for development (app uses custom auth, not Firebase Auth)
+    // TODO: Add proper Firebase Auth later for production security
+    match /{allPaths=**} {
+      allow read, write: if true;
+    }
+  }
+}

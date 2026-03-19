@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textbook Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Login View -->
+        <div id="login-view" class="view hidden">
+            <div class="card login-card">
+                <div class="icon-wrapper">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <h1>Textbook Tracker</h1>
+                <p>Welcome! Please sign in to continue.</p>
+                
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" required placeholder="Enter your username">
+                    </div>
+                    <div class="form-group">
+                        <label>I am a...</label>
+                        <div class="role-selector">
+                            <label class="role-option">
+                                <input type="radio" name="role" value="student" checked>
+                                <span class="role-btn">Student</span>
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary w-full">Sign In / Create Account</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Setup View (Teachers Only) -->
+        <div id="setup-view" class="view hidden">
+            <div class="card setup-card">
+                <div class="icon-wrapper">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                </div>
+                <h1>Welcome to Textbook Tracker</h1>
+                <p>Let's get set up for the new school year.</p>
+                
+                <form id="setup-form">
+                    <div class="form-group">
+                        <label for="textbook-name">Textbook Name</label>
+                        <input type="text" id="textbook-name" required placeholder="e.g. Advanced Biology 101">
+                    </div>
+                    <button type="submit" class="btn-primary">Start Tracking</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dashboard View -->
+        <div id="dashboard-view" class="view hidden">
+            <header class="dashboard-header">
+                <div>
+                    <p class="subtitle" id="user-greeting">Hello, User</p>
+                    <h1 id="display-textbook-name">Textbook Name</h1>
+                </div>
+                <div class="header-actions">
+                    <input type="file" id="document-upload" class="hidden" accept=".pdf,.doc,.docx,.txt" multiple>
+                    <button id="upload-doc-btn" class="btn-primary btn-small">Upload Document</button>
+                    <button id="reset-btn" class="btn-secondary btn-small teacher-only" title="Start a new year">Run Setup Again</button>
+                    <button id="logout-btn" class="btn-secondary btn-small">Sign Out</button>
+                </div>
+            </header>
+
+            <main class="dashboard-grid">
+                <!-- Daily Entry Card (Teacher Only) -->
+                <section class="card entry-card teacher-only">
+                    <h2>Daily Log</h2>
+                    <p class="date-display" id="current-date-display"></p>
+                    
+                    <form id="daily-log-form">
+                        <div class="toggle-group">
+                            <label class="toggle-control">
+                                <input type="checkbox" id="had-work-toggle" checked>
+                                <span class="control"></span>
+                                <span class="label-text">Did we have work today?</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group" id="pages-input-group">
+                            <label for="pages-done">Pages Covered</label>
+                            <input type="text" id="pages-done" placeholder="e.g. 45-48, 52">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notes">Additional Notes (Optional)</label>
+                            <textarea id="notes" rows="2" placeholder="Any comments about today's lesson..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-primary w-full">Save Entry</button>
+                    </form>
+                </section>
+
+                <!-- History Card -->
+                <section class="card history-card" id="history-section">
+                    <h2>History</h2>
+                    <div class="history-list" id="history-container">
+                        <!-- History items injected here via JS -->
+                    </div>
+                </section>
+
+                <!-- Leaderboard Card -->
+                <section class="card leaderboard-card">
+                    <h2>Leaderboard <span class="points-badge" id="student-points-badge" style="display:none">0 pts</span></h2>
+                    <div class="leaderboard-list" id="leaderboard-container">
+                        <!-- Leaderboard items injected here via JS -->
+                    </div>
+                </section>
+            </main>
+        </div>
+        <!-- Quiz Modal -->
+        <div id="quiz-modal" class="modal hidden">
+            <div class="modal-content card">
+                <div class="modal-header">
+                    <h2>Quiz Generator</h2>
+                    <button id="close-modal-btn" class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="quiz-setup-section">
+                        <p class="mb-4">Document <strong id="loaded-doc-name"></strong> loaded successfully. Configure your quiz:</p>
+                        
+                        <div class="form-group">
+                            <label for="quiz-topic">Topic / Focus Area</label>
+                            <input type="text" id="quiz-topic" placeholder="e.g. Cell Division, Algebra, Chapter 1 Summary" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="quiz-difficulty">Difficulty Level</label>
+                            <div class="role-selector">
+                                <label class="role-option">
+                                    <input type="radio" name="difficulty" value="Easy" checked>
+                                    <span class="role-btn">Easy</span>
+                                </label>
+                                <label class="role-option">
+                                    <input type="radio" name="difficulty" value="Medium">
+                                    <span class="role-btn">Medium</span>
+                                </label>
+                                <label class="role-option">
+                                    <input type="radio" name="difficulty" value="Hard">
+                                    <span class="role-btn">Hard</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button id="generate-quiz-btn" class="btn-primary w-full mt-4">Generate Quiz</button>
+                    </div>
+
+                    <div id="quiz-loading-section" class="hidden text-center py-8">
+                        <div class="spinner"></div>
+                        <p class="mt-4 text-muted">Analyzing document and generating custom questions...</p>
+                    </div>
+
+                    <div id="quiz-results-section" class="hidden">
+                        <div id="generated-quiz-container">
+                            <!-- Quiz content will be injected here -->
+                        </div>
+                        
+                        <div id="quiz-score-container" class="hidden" style="text-align: center; margin-top: 1.5rem; padding: 1rem; background: #f3f4f6; border-radius: 8px;">
+                            <h3 id="quiz-score-text" style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #111827;"></h3>
+                            <p id="quiz-points-text" style="color: #10b981; font-weight: 500; margin: 0;"></p>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <button id="submit-quiz-btn" class="btn-primary w-full">Submit Answers</button>
+                            <button id="finish-quiz-btn" class="btn-secondary w-full hidden">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF.js for client-side PDF text extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>
+        // Set the workerSrc for PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    </script>
+    
+    <!-- Mammoth.js for client-side .docx text extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    
+    <script src="script.js"></script>
+</body>
+</html>

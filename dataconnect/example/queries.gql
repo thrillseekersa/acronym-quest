@@ -1,0 +1,60 @@
+# Operation 1: Create a new StudySet for the current user
+mutation CreateStudySet($name: String!, $description: String, $isPublic: Boolean!, $subjectId: UUID!) @auth(level: USER, insecureReason: "User-specific data creation is safe for logged-in users.") {
+  studySet_insert(data: {
+    userId_expr: "auth.uid",
+    name: $name,
+    description: $description,
+    isPublic: $isPublic,
+    subjectId: $subjectId
+  })
+}
+
+# Operation 2: Get all StudySets created by the current user
+query GetMyStudySets @auth(level: USER, insecureReason: "Retrieving a user's own study sets is safe.") {
+  studySets(where: {userId: {eq_expr: "auth.uid"}}) {
+    id
+    name
+    description
+    isPublic
+    createdAt
+    subject {
+      id
+      name
+    }
+  }
+}
+
+# Operation 3: Get a specific public StudySet by ID
+query GetPublicStudySet($id: UUID!) @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public as it only retrieves public study sets.") {
+  studySet(id: $id, where: {isPublic: {eq: true}}) {
+    id
+    name
+    description
+    isPublic
+    createdAt
+    user {
+      username
+    }
+    subject {
+      name
+    }
+    studyItems_on_studySet {
+      id
+      contentFront
+      contentBack
+      itemType
+      hint
+    }
+  }
+}
+
+# Operation 4: Insert a new StudyItem into an existing StudySet (assuming the StudySet belongs to the current user)
+mutation AddStudyItemToSet($studySetId: UUID!, $contentFront: String!, $contentBack: String!, $itemType: String!, $hint: String) @auth(level: USER, insecureReason: "User-specific data modification is safe for logged-in users.") {
+  studyItem_insert(data: {
+    studySetId: $studySetId,
+    contentFront: $contentFront,
+    contentBack: $contentBack,
+    itemType: $itemType,
+    hint: $hint
+  })
+}

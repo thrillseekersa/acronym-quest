@@ -1,0 +1,40 @@
+type User @table {
+  username: String!
+  email: String!
+  createdAt: Timestamp!
+  avatarUrl: String
+  totalPoints: Int
+}
+
+type Subject @table {
+  name: String!
+  createdAt: Timestamp!
+  description: String
+}
+
+type StudySession @table {
+  user: User!
+  subject: Subject!
+  startTime: Timestamp!
+  endTime: Timestamp!
+  pointsEarned: Int!
+  createdAt: Timestamp!
+  goalsAchieved: String
+}
+
+type StudySet @table {
+  user: User!
+  subject: Subject!
+  name: String!
+  createdAt: Timestamp!
+  isPublic: Boolean!
+  description: String
+}
+
+type StudyItem @table {
+  studySet: StudySet!
+  contentFront: String!
+  contentBack: String!
+  itemType: String!
+  hint: String
+}

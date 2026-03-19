@@ -1,0 +1,185 @@
+.mobile-app-container {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  background-color: #1f2937;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 4px solid #374151;
+  padding: 1rem;
+  background-color: #111827;
+}
+
+.mobile-header h1 {
+  font-size: 1.25rem;
+  margin: 0;
+  text-transform: uppercase;
+  color: #f59e0b;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.mobile-main {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.dashboard-panel, .quiz-panel, .game-over-panel {
+  width: 100%;
+  max-width: 600px;
+  background-color: #374151;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 4px solid #4b5563;
+  box-sizing: border-box;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  background: #1f2937;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1.2rem;
+}
+
+.textbook-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.textbook-card {
+  background: #4b5563;
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.textbook-card h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.textbook-card p {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+.action-btn {
+  background-color: #3b82f6;
+  color: white;
+  padding: 1rem;
+  border: 4px solid #000;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.action-btn:disabled {
+  background-color: #6b7280;
+  cursor: not-allowed;
+  border-color: #4b5563;
+}
+
+.action-btn.secondary {
+  background-color: #ef4444;
+}
+
+/* Quiz Styles */
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px dashed #4b5563;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.quiz-header h3 {
+  margin: 0;
+}
+
+.question-text {
+  font-size: 1.25rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.option-item {
+  background: #f3f4f6;
+  color: #1f2937;
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border: 4px solid transparent;
+}
+
+.option-item.selected {
+  border-color: #3b82f6;
+  background: #e0f2fe;
+}
+
+.feedback-banner {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1.2rem;
+  border: 4px solid #000;
+}
+
+.feedback-banner.correct {
+  background-color: #10b981;
+  color: white;
+}
+
+.feedback-banner.incorrect {
+  background-color: #ef4444;
+  color: white;
+}
+
+.quiz-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.game-over-panel {
+  background-color: #7f1d1d;
+  border-color: #ef4444;
+  text-align: center;
+}
+
+.game-over-panel h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 0 #000;
+}

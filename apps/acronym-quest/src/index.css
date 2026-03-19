@@ -1,0 +1,311 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-baby-purple: #EDE9FE;
+  --color-baby-pink: #FCE7F3;
+  --color-baby-yellow: #FEF9C3;
+  --color-baby-blue: #DBEAFE;
+  --color-cosmic-bg: transparent;
+  --color-cosmic-card: rgba(255, 255, 255, 0.85);
+  --color-cosmic-surface: rgba(248, 250, 252, 0.7);
+  --color-cosmic-text: #0F172A;
+  --color-cosmic-muted: #64748B;
+  --color-cosmic-purple: var(--color-baby-purple);
+  --color-cosmic-amber: var(--color-baby-yellow);
+  --color-cosmic-blue: var(--color-baby-blue);
+  --font-heading: 'Fredoka One', cursive;
+  --font-body: 'Quicksand', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Custom Star Cursor */
+body {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="%23FEF08A" stroke="%23CA8A04" stroke-width="1.5" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>') 14 14, auto;
+}
+
+button, a, input[type="submit"], [role="button"], .cursor-pointer {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="%23FDE047" stroke="%23A16207" stroke-width="2.5" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>') 14 14, pointer !important;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: #FFFFFF;
+  background-image: url('/school-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  color: var(--color-cosmic-text);
+  margin: 0;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--color-cosmic-text);
+}
+
+/* 3D Pushable Buttons */
+.btn-soft {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 1.5rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+  border: 4px solid rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  box-shadow: 0 6px 0 0 rgba(0, 0, 0, 0.05);
+  position: relative;
+  top: 0;
+}
+
+.btn-soft:active {
+  top: 3px;
+  box-shadow: 0 3px 0 0 rgba(0, 0, 0, 0.05);
+}
+
+.btn-soft-purple {
+  background: var(--color-baby-purple);
+  color: var(--color-cosmic-text);
+  border-color: #DDD6FE;
+  box-shadow: 0 6px 0 0 #DDD6FE;
+}
+
+.btn-soft-purple:active {
+  box-shadow: 0 3px 0 0 #DDD6FE;
+}
+
+.btn-soft-yellow {
+  background: var(--color-baby-yellow);
+  color: var(--color-cosmic-text);
+  border-color: #FEF08A;
+  box-shadow: 0 6px 0 0 #FEF08A;
+}
+
+.btn-soft-yellow:active {
+  box-shadow: 0 3px 0 0 #FEF08A;
+}
+
+.btn-soft-blue {
+  background: var(--color-baby-blue);
+  color: var(--color-cosmic-text);
+  border-color: #BFDBFE;
+  box-shadow: 0 6px 0 0 #BFDBFE;
+}
+
+.btn-soft-blue:active {
+  box-shadow: 0 3px 0 0 #BFDBFE;
+}
+
+/* Comic-book Cards */
+.card-soft {
+  background: var(--color-cosmic-card);
+  backdrop-filter: blur(12px);
+  border: 4px solid rgba(255, 255, 255, 0.5);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.card-pink { border-color: #FCE7F3; }
+.card-blue { border-color: #DBEAFE; }
+.card-yellow { border-color: #FEF9C3; }
+.card-purple { border-color: #EDE9FE; }
+
+/* Inputs */
+.input-cosmic {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  border: 3px solid var(--color-cosmic-surface);
+  background: var(--color-cosmic-bg);
+  color: var(--color-cosmic-text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-cosmic:focus {
+  border-color: var(--color-cosmic-purple);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+.input-cosmic::placeholder {
+  color: var(--color-cosmic-muted);
+}
+
+/* Badge Glow */
+@keyframes badge-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(148, 163, 184, 0.2); }
+  50% { box-shadow: 0 0 20px rgba(148, 163, 184, 0.4); }
+}
+
+.badge-earned {
+  animation: badge-glow 2s ease-in-out infinite;
+}
+
+/* Marquee Ticker */
+@keyframes scroll-left {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.ticker-scroll {
+  animation: scroll-left 25s linear infinite;
+  color: var(--color-cosmic-muted);
+  font-weight: 500;
+}
+
+/* Timer ring */
+@keyframes timer-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.timer-critical {
+  animation: timer-pulse 0.6s ease-in-out infinite;
+  color: #F87171;
+}
+
+/* Shake animation for duplicate username */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Floating particles */
+.star-particle {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  background: rgba(148, 163, 184, 0.1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Super Combo Styles (Sparkle Theme) */
+@keyframes combo-pulse {
+  0%, 100% { 
+    border-color: #CBD5E1;
+    box-shadow: 0 0 15px rgba(203, 213, 225, 0.3);
+  }
+  50% { 
+    border-color: #94A3B8;
+    box-shadow: 0 0 25px rgba(148, 163, 184, 0.5);
+  }
+}
+
+.super-combo-card {
+  animation: combo-pulse 1.2s ease-in-out infinite;
+  border-color: #94A3B8 !important;
+}
+
+@keyframes sparkle-glow {
+  0%, 100% { text-shadow: 0 0 10px rgba(226, 232, 240, 0.8); }
+  50% { text-shadow: 0 0 20px rgba(148, 163, 184, 0.4), 0 0 30px rgba(226, 232, 240, 0.6); }
+}
+
+.combo-trigger-text {
+  animation: sparkle-glow 1s ease-in-out infinite;
+  color: #475569 !important;
+}
+
+.combo-badge {
+  background: #F1F5F9 !important;
+  color: #64748B !important;
+  border: 2px solid #CBD5E1 !important;
+}
+
+/* Navigation Buttons (Study, Quiz, Shop) */
+.nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.6rem 1.4rem 1.2rem;
+  border-radius: 2rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+  border: 4px solid rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  top: 0;
+  color: var(--color-cosmic-text);
+  min-width: 100px;
+}
+
+.nav-btn:active {
+  top: 4px;
+}
+
+/* Icon badge floating on top */
+.nav-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  font-size: 1.75rem;
+  background: rgba(255, 255, 255, 0.65);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.nav-btn-blue {
+  background: var(--color-baby-blue);
+  border-color: #BFDBFE;
+  box-shadow: 0 7px 0 0 #BFDBFE, inset 0 -3px 6px rgba(0, 0, 0, 0.04), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+}
+
+.nav-btn-blue:active {
+  box-shadow: 0 3px 0 0 #BFDBFE, inset 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.nav-btn-yellow {
+  background: var(--color-baby-yellow);
+  border-color: #FEF08A;
+  box-shadow: 0 7px 0 0 #FEF08A, inset 0 -3px 6px rgba(0, 0, 0, 0.04), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+}
+
+.nav-btn-yellow:active {
+  box-shadow: 0 3px 0 0 #FEF08A, inset 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.nav-btn-purple {
+  background: var(--color-baby-purple);
+  border-color: #DDD6FE;
+  box-shadow: 0 7px 0 0 #DDD6FE, inset 0 -3px 6px rgba(0, 0, 0, 0.04), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+}
+
+.nav-btn-purple:active {
+  box-shadow: 0 3px 0 0 #DDD6FE, inset 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.nav-btn-green {
+  background: #DCFCE7;
+  border-color: #BBF7D0;
+  box-shadow: 0 7px 0 0 #BBF7D0, inset 0 -3px 6px rgba(0, 0, 0, 0.04), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+}
+
+.nav-btn-green:active {
+  box-shadow: 0 3px 0 0 #BBF7D0, inset 0 2px 4px rgba(0, 0, 0, 0.04);
+}

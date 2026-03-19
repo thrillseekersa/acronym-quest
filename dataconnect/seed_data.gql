@@ -1,0 +1,68 @@
+mutation SeedInitialData @transaction @auth(level: USER, insecureReason: "Seed data is for initial setup and does not expose sensitive user data.") {
+  user1: user_insert(data: {
+    id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+    username: "testuser1",
+    email: "test1@example.com",
+    createdAt: "2023-01-01T10:00:00Z",
+    avatarUrl: "https://example.com/avatar1.png",
+    totalPoints: 100
+  })
+  user2: user_insert(data: {
+    id: "b1f0e3c5-8d1f-4c7a-9a0c-5d1e2f3a4b5c",
+    username: "testuser2",
+    email: "test2@example.com",
+    createdAt: "2023-01-02T11:00:00Z",
+    avatarUrl: "https://example.com/avatar2.png",
+    totalPoints: 50
+  })
+  subject1: subject_insert(data: {
+    id: "c2a1d4e0-7e8b-4f9c-a0b1-6e7f8g9h0i1j",
+    name: "Mathematics",
+    description: "Fundamental concepts in mathematics.",
+    createdAt: "2023-01-03T12:00:00Z"
+  })
+  subject2: subject_insert(data: {
+    id: "d3b2e5f1-6a9c-4d8b-b1c2-7f8g9h0i1j2k",
+    name: "Science",
+    description: "Exploring the natural world.",
+    createdAt: "2023-01-04T13:00:00Z"
+  })
+  studySet1: studySet_insert(data: {
+    id: "e4c3f6g2-5b0d-4e9c-c2d3-8g9h0i1j2k3l",
+    userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+    subjectId: "c2a1d4e0-7e8b-4f9c-a0b1-6e7f8g9h0i1j",
+    name: "Algebra Basics",
+    description: "Key concepts for Algebra I",
+    createdAt: "2023-01-05T14:00:00Z",
+    isPublic: true
+  })
+  studySet2: studySet_insert(data: {
+    id: "f5d4g7h3-4c1e-4f0d-d3e4-9h0i1j2k3l4m",
+    userId: "b1f0e3c5-8d1f-4c7a-9a0c-5d1e2f3a4b5c",
+    subjectId: "d3b2e5f1-6a9c-4d8b-b1c2-7f8g9h0i1j2k",
+    name: "Biology Terms",
+    description: "Common terms in introductory Biology",
+    createdAt: "2023-01-06T15:00:00Z",
+    isPublic: false
+  })
+  studyItem1: studyItem_insert(data: {
+    studySetId: "e4c3f6g2-5b0d-4e9c-c2d3-8g9h0i1j2k3l",
+    contentFront: "What is a variable?",
+    contentBack: "A symbol (like x or y) that represents a value.",
+    itemType: "flashcard",
+    hint: "It's a letter."
+  })
+  studyItem2: studyItem_insert(data: {
+    studySetId: "e4c3f6g2-5b0d-4e9c-c2d3-8g9h0i1j2k3l",
+    contentFront: "Solve for x: x + 5 = 10",
+    contentBack: "x = 5",
+    itemType: "question"
+  })
+  studyItem3: studyItem_insert(data: {
+    studySetId: "f5d4g7h3-4c1e-4f0d-d3e4-9h0i1j2k3l4m",
+    contentFront: "What is photosynthesis?",
+    contentBack: "The process by which plants convert light energy into chemical energy.",
+    itemType: "flashcard",
+    hint: "It involves light."
+  })
+}

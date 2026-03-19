@@ -239,7 +239,7 @@ export default function GamifiedDashboard() {
     setChatLoading(true);
 
     try {
-      const currentAcronym = dailyAcronyms[currentIndex] || dailyAcronyms[0];
+      const currentAcronym = dailyAcronyms[0];
       const answer = await askAIService(
         currentAcronym?.acronym || '',
         currentAcronym?.breakdown || '',

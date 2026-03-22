@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc, onSnapshot } from 'firebase/firestore';
 import StarryLoading from '../components/StarryLoading';
 
 const AuthContext = createContext();
@@ -157,6 +157,17 @@ export function AuthProvider({ children }) {
     }
     init();
   }, []);
+
+  // Real-time listener to keep userData in sync (points, badges, etc.)
+  useEffect(() => {
+    if (!currentUser) return;
+    const unsub = onSnapshot(doc(db, 'users', currentUser.uid), (snap) => {
+      if (snap.exists()) {
+        setUserData(snap.data());
+      }
+    });
+    return unsub;
+  }, [currentUser]);
 
   const value = {
     currentUser, userData, loading,

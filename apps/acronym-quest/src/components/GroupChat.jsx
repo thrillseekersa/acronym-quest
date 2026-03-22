@@ -26,7 +26,7 @@ export default function GroupChat({ isOpen, onClose }) {
     const q = query(
       collection(db, 'chat_messages'),
       orderBy('timestamp', 'asc'),
-      limit(50)
+      limit(1000)
     );
 
     const unsub = onSnapshot(q, (snap) => {

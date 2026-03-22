@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { db, storage } from '../firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -175,8 +175,23 @@ export default function ManualView() {
   const [showShop, setShowShop] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showSkipSplash, setShowSkipSplash] = useState(false);
+  const [leaderboard, setLeaderboard] = useState([]);
   const { currentUser, userData, logout, updateUserFields } = useAuth();
   const navigate = useNavigate();
+
+  // Fetch leaderboard — top 10 users by points
+  useEffect(() => {
+    async function loadLeaderboard() {
+      try {
+        const q = query(collection(db, 'users'), orderBy('points', 'desc'), limit(10));
+        const snap = await getDocs(q);
+        setLeaderboard(snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(u => !u.isAdmin));
+      } catch (err) {
+        console.log('Leaderboard load error:', err.message);
+      }
+    }
+    loadLeaderboard();
+  }, []);
 
   // Skip-day detection
   useEffect(() => {
@@ -361,6 +376,29 @@ export default function ManualView() {
                 <p className="text-cosmic-muted">Spend points!</p>
               </div>
             </div>
+          </div>
+
+          {/* Leaderboard */}
+          <div className="card-soft">
+            <h2 className="text-lg text-indigo-600 font-bold mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
+              🏆 Top Students
+            </h2>
+            {leaderboard.length === 0 ? (
+              <p className="text-cosmic-muted text-sm text-center py-4">No scores yet — be the first!</p>
+            ) : (
+              <div className="space-y-2">
+                {leaderboard.map((entry, i) => (
+                  <div key={entry.id} className="flex items-center justify-between py-2 px-3 rounded-xl" style={{ background: i === 0 ? '#FEF9C3' : i === 1 ? '#F1F5F9' : i === 2 ? '#FED7AA' : 'transparent' }}>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`}</span>
+                      <Avatar avatar={entry.avatar} size={24} />
+                      <span className="text-sm font-bold text-cosmic-text">{entry.fullName || entry.username}</span>
+                    </div>
+                    <span className="font-bold text-sm text-indigo-600">⭐ {entry.points || 0}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </motion.div>
       )}

@@ -69,7 +69,7 @@ export default function QuizPage() {
 
     setQuestions(qs);
     setAnswers({});
-    setTimer(60);
+    setTimer(120);
     setQuizState('active');
   }
 
@@ -124,7 +124,7 @@ export default function QuizPage() {
         score: correct,
         total: questions.length,
         percentage,
-        timeUsed: 60 - timer,
+        timeUsed: 120 - timer,
         timestamp: serverTimestamp()
       });
 
@@ -204,7 +204,7 @@ export default function QuizPage() {
             <h2 className="text-2xl text-indigo-600 font-bold mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
               Ready to Quiz?
             </h2>
-            <p className="text-cosmic-muted mb-2 text-sm">10 questions · 60 seconds · Identify BOTH breakdown AND meaning</p>
+            <p className="text-cosmic-muted mb-2 text-sm">10 questions · 2 minutes · Identify BOTH breakdown AND meaning</p>
             <p className="text-cosmic-blue font-bold text-sm mb-6">Get both right for a 🌟 Star Point!</p>
             <button onClick={generateQuestions} className="btn-soft btn-soft-blue text-lg">
               ✨ Start Quiz!

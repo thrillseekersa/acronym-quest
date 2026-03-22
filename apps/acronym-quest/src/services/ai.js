@@ -41,7 +41,11 @@ Keep it concise and actionable.`;
 }
 
 export async function moderateChat(messages) {
-  const messageList = messages.map((m, i) =>
+  // Exclude admin messages from moderation
+  const studentMessages = messages.filter(m => m.username !== 'Sayuri');
+  if (studentMessages.length === 0) return [];
+
+  const messageList = studentMessages.map((m, i) =>
     `[${i}] ${m.fullName || m.username} (ID: ${m.id}): "${m.text}"`
   ).join('\n');
 

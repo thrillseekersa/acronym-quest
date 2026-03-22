@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { db } from '../firebase';
+import { db, storage } from '../firebase';
 import { collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import Avatar from './Avatar';
@@ -9,8 +10,10 @@ export default function GroupChat({ isOpen, onClose }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const { currentUser, userData } = useAuth();
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -57,6 +60,45 @@ export default function GroupChat({ isOpen, onClose }) {
       console.error('Error sending message:', err);
     }
     setSending(false);
+  }
+
+  async function handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type and size (max 5MB)
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image must be under 5MB.');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileName = `chat_images/${Date.now()}_${currentUser.uid}_${file.name}`;
+      const storageRef = ref(storage, fileName);
+      await uploadBytes(storageRef, file);
+      const imageUrl = await getDownloadURL(storageRef);
+
+      await addDoc(collection(db, 'chat_messages'), {
+        text: '',
+        imageUrl,
+        userId: currentUser.uid,
+        username: userData.username,
+        fullName: userData.fullName,
+        avatar: userData.avatar || '👤',
+        timestamp: serverTimestamp()
+      });
+    } catch (err) {
+      console.error('Error uploading image:', err);
+      alert('Failed to upload image. Please try again.');
+    }
+    setUploading(false);
+    // Reset file input
+    if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
   function formatTime(timestamp) {
@@ -124,7 +166,18 @@ export default function GroupChat({ isOpen, onClose }) {
                       ? 'bg-baby-purple text-cosmic-text rounded-br-md border border-purple-200'
                       : 'bg-white text-cosmic-text rounded-bl-md border border-gray-200 shadow-sm'
                   }`}>
-                    {msg.text}
+                    {/* Image message */}
+                    {msg.imageUrl && (
+                      <a href={msg.imageUrl} target="_blank" rel="noopener noreferrer">
+                        <img
+                          src={msg.imageUrl}
+                          alt="Shared image"
+                          className="rounded-lg max-w-full max-h-[200px] object-cover mb-1 cursor-pointer hover:opacity-90 transition-opacity"
+                          loading="lazy"
+                        />
+                      </a>
+                    )}
+                    {msg.text && msg.text}
                     <span className={`block text-[9px] mt-1 ${isOwn ? 'text-purple-400 text-right' : 'text-gray-400'}`}>
                       {formatTime(msg.timestamp)}
                     </span>
@@ -136,8 +189,33 @@ export default function GroupChat({ isOpen, onClose }) {
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Upload indicator */}
+        {uploading && (
+          <div className="px-3 py-1 text-center text-xs text-cosmic-muted" style={{ background: '#F0FDF4' }}>
+            📸 Uploading image...
+          </div>
+        )}
+
         {/* Input */}
-        <div className="px-3 py-2 flex gap-2" style={{ background: '#F0FDF4', borderTop: '2px solid rgba(0,0,0,0.05)' }}>
+        <div className="px-3 py-2 flex gap-2 items-center" style={{ background: '#F0FDF4', borderTop: '2px solid rgba(0,0,0,0.05)' }}>
+          {/* Hidden file input */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleImageUpload}
+            accept="image/*"
+            className="hidden"
+          />
+          {/* Image button */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="text-lg hover:scale-110 transition-transform"
+            title="Send image"
+            style={{ opacity: uploading ? 0.5 : 1 }}
+          >
+            📷
+          </button>
           <input
             type="text"
             value={input}

@@ -5,6 +5,8 @@ import ManualView from './pages/ManualView';
 import GamifiedDashboard from './pages/GamifiedDashboard';
 import QuizPage from './pages/QuizPage';
 import AdminDashboard from './pages/AdminDashboard';
+import CountdownScreen from './components/CountdownScreen';
+import { useState } from 'react';
 
 function ProtectedRoute({ children }) {
   const { currentUser, loading } = useAuth();
@@ -14,6 +16,14 @@ function ProtectedRoute({ children }) {
 
 function StudentView() {
   const { userData } = useAuth();
+  const [countdownDone, setCountdownDone] = useState(
+    new Date() >= new Date('2026-03-27T00:00:00+02:00')
+  );
+
+  if (!countdownDone) {
+    return <CountdownScreen onComplete={() => setCountdownDone(true)} />;
+  }
+
   if (userData?.studyGroup === 'Gamified') return <GamifiedDashboard />;
   return <ManualView />;
 }

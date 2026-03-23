@@ -17,7 +17,7 @@ function ProtectedRoute({ children }) {
 function StudentView() {
   const { userData } = useAuth();
   const [countdownDone, setCountdownDone] = useState(
-    new Date() >= new Date('2026-03-27T00:00:00+02:00')
+    new Date() >= new Date('2026-03-28T00:00:00+02:00')
   );
 
   if (!countdownDone) {

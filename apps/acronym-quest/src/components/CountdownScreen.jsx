@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { db } from '../firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
-const TARGET_DATE = new Date('2026-03-27T00:00:00+02:00'); // March 27, midnight SAST
+const TARGET_DATE = new Date('2026-03-28T00:00:00+02:00'); // March 28, midnight SAST
 
 function getTimeLeft() {
   const now = new Date();
@@ -18,6 +20,10 @@ function getTimeLeft() {
 
 export default function CountdownScreen({ onComplete }) {
   const [timeLeft, setTimeLeft] = useState(getTimeLeft);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [checking, setChecking] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -31,7 +37,29 @@ export default function CountdownScreen({ onComplete }) {
     return () => clearInterval(interval);
   }, [onComplete]);
 
-  // If countdown is over, don't render
+  async function handleAdminLogin() {
+    if (!password.trim() || checking) return;
+    setChecking(true);
+    setError('');
+    try {
+      const q = query(collection(db, 'users'), where('username', '==', 'Sayuri'));
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        setError('Admin account not found');
+      } else {
+        const data = snap.docs[0].data();
+        if (data.password === password) {
+          onComplete?.();
+        } else {
+          setError('Wrong password');
+        }
+      }
+    } catch (err) {
+      setError('Error checking credentials');
+    }
+    setChecking(false);
+  }
+
   if (!timeLeft) return null;
 
   const blocks = [
@@ -43,7 +71,53 @@ export default function CountdownScreen({ onComplete }) {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)' }}>
+      style={{ backgroundImage: "url('/school-bg.png')", backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+
+      {/* Dark overlay for readability */}
+      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.45)' }} />
+
+      {/* Admin button - top right */}
+      <button
+        onClick={() => setShowAdmin(!showAdmin)}
+        className="absolute top-4 right-4 z-20 text-white/40 hover:text-white/80 transition-colors text-xl"
+        title="Admin access"
+      >
+        🔒
+      </button>
+
+      {/* Admin password popup */}
+      <AnimatePresence>
+        {showAdmin && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="absolute top-14 right-4 z-20 rounded-xl p-4 w-64"
+            style={{ background: 'rgba(255,255,255,0.95)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}
+          >
+            <p className="text-sm font-bold text-gray-700 mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
+              🔑 Admin Access
+            </p>
+            <input
+              type="password"
+              value={password}
+              onChange={e => { setPassword(e.target.value); setError(''); }}
+              onKeyDown={e => e.key === 'Enter' && handleAdminLogin()}
+              placeholder="Enter admin password"
+              className="w-full px-3 py-2 rounded-lg text-xs border-2 border-gray-200 outline-none focus:border-indigo-400 mb-2"
+            />
+            {error && <p className="text-red-500 text-xs mb-2">{error}</p>}
+            <button
+              onClick={handleAdminLogin}
+              disabled={checking || !password.trim()}
+              className="w-full py-2 rounded-lg text-xs font-bold text-white"
+              style={{ background: '#6366F1', opacity: checking ? 0.6 : 1 }}
+            >
+              {checking ? '⏳ Checking...' : 'Enter'}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Animated background particles */}
       {[...Array(20)].map((_, i) => (
@@ -76,7 +150,6 @@ export default function CountdownScreen({ onComplete }) {
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className="text-center z-10 px-6"
       >
-        {/* Logo */}
         <motion.div
           className="text-6xl mb-4"
           animate={{ rotate: [0, 5, -5, 0] }}
@@ -99,7 +172,6 @@ export default function CountdownScreen({ onComplete }) {
           Program starts in...
         </motion.p>
 
-        {/* Countdown blocks */}
         <div className="flex gap-3 md:gap-5 justify-center mb-10">
           {blocks.map((block, i) => (
             <motion.div
@@ -133,7 +205,6 @@ export default function CountdownScreen({ onComplete }) {
           ))}
         </div>
 
-        {/* Motivational text */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

@@ -446,10 +446,10 @@ export default function AdminDashboard() {
                     setModerating(true);
                     setFlaggedMessages([]);
                     try {
-                      // Fetch latest chat messages
-                      const q = query(collection(db, 'chat_messages'), orderBy('timestamp', 'asc'), limit(100));
+                      // Fetch latest chat messages (newest first, then reverse)
+                      const q = query(collection(db, 'chat_messages'), orderBy('timestamp', 'desc'), limit(200));
                       const snap = await getDocs(q);
-                      const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                      const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() })).reverse();
                       setChatMessages(msgs);
 
                       if (msgs.length === 0) {

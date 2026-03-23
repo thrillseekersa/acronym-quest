@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { db, storage } from '../firebase';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -181,16 +181,13 @@ export default function ManualView() {
 
   // Fetch leaderboard — top 10 users by points
   useEffect(() => {
-    async function loadLeaderboard() {
-      try {
-        const q = query(collection(db, 'users'), orderBy('points', 'desc'), limit(10));
-        const snap = await getDocs(q);
-        setLeaderboard(snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(u => !u.isAdmin));
-      } catch (err) {
-        console.log('Leaderboard load error:', err.message);
-      }
-    }
-    loadLeaderboard();
+    const q = query(collection(db, 'users'), orderBy('points', 'desc'), limit(10));
+    const unsub = onSnapshot(q, (snap) => {
+      setLeaderboard(snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(u => !u.isAdmin));
+    }, (err) => {
+      console.log('Leaderboard load error:', err.message);
+    });
+    return unsub;
   }, []);
 
   // Skip-day detection

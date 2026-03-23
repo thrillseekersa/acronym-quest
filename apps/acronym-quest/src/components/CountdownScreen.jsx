@@ -76,14 +76,26 @@ export default function CountdownScreen({ onComplete }) {
       {/* Dark overlay for readability */}
       <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.45)' }} />
 
-      {/* Admin button - top right */}
-      <button
-        onClick={() => setShowAdmin(!showAdmin)}
-        className="absolute top-4 right-4 z-20 text-white/40 hover:text-white/80 transition-colors text-xl"
-        title="Admin access"
-      >
-        🔒
-      </button>
+      {/* Top bar - exit + admin */}
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-3">
+        <button
+          onClick={() => {
+            localStorage.removeItem('aq_user');
+            window.location.href = '/auth';
+          }}
+          className="text-white/50 hover:text-white/90 transition-colors text-xs font-medium px-3 py-1.5 rounded-lg"
+          style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}
+        >
+          ↩ Exit
+        </button>
+        <button
+          onClick={() => setShowAdmin(!showAdmin)}
+          className="text-white/40 hover:text-white/80 transition-colors text-xl"
+          title="Admin access"
+        >
+          🔒
+        </button>
+      </div>
 
       {/* Admin password popup */}
       <AnimatePresence>

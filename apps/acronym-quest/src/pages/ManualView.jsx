@@ -60,7 +60,8 @@ export default function ManualView() {
   // ── LOCKED OUT SCREEN ──
   if (lockedOut) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6">
+      <div className="min-h-screen flex flex-col items-center justify-center p-6"
+        style={{ backgroundImage: "url('/trad-bg.png')", backgroundSize: '400px', backgroundRepeat: 'repeat' }}>
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -92,7 +93,8 @@ export default function ManualView() {
 
   // ── STUDY SCREEN ──
   return (
-    <div className="min-h-screen p-4 max-w-2xl mx-auto">
+    <div className="min-h-screen p-4 max-w-2xl mx-auto"
+      style={{ backgroundImage: "url('/trad-bg.png')", backgroundSize: '400px', backgroundRepeat: 'repeat' }}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>

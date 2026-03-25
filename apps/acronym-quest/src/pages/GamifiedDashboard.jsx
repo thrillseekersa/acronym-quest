@@ -191,6 +191,8 @@ export default function GamifiedDashboard() {
   const [showChat, setShowChat] = useState(false);
   const [showSkipSplash, setShowSkipSplash] = useState(false);
   const [studyLocked, setStudyLocked] = useState(false);
+  const [wrongAnswers, setWrongAnswers] = useState([]);
+  const [showReview, setShowReview] = useState(false);
 
   // Check if already studied today
   useEffect(() => {
@@ -492,6 +494,19 @@ export default function GamifiedDashboard() {
       } else {
         setFeedbackType('wrong');
         setStreak(0);
+        // Track wrong answer for review
+        const correctBreakdown = currentQ.breakdownOptions.find(o => o.isCorrect)?.text;
+        const correctMeaning = currentQ.meaningOptions.find(o => o.isCorrect)?.text;
+        const acronym = dailyAcronyms.find(a => a.id === currentQ.correctId);
+        setWrongAnswers(prev => [...prev, {
+          acronym: acronym?.acronym || '?',
+          correctBreakdown: correctBreakdown || '',
+          correctMeaning: correctMeaning || '',
+          yourBreakdown: breakdownCorrect ? correctBreakdown : currentQ.breakdownOptions[selectedAnswer]?.text || '?',
+          yourMeaning: meaningCorrect ? correctMeaning : currentQ.meaningOptions[idx]?.text || '?',
+          breakdownWrong: !breakdownCorrect,
+          meaningWrong: !meaningCorrect
+        }]);
       }
 
       setQStep('feedback');
@@ -995,12 +1010,59 @@ export default function GamifiedDashboard() {
                 {score} / {totalAttempted} correct ({totalAttempted > 0 ? Math.round((score / totalAttempted) * 100) : 0}%)
               </p>
               <p className="text-cosmic-muted text-sm mb-6">
-                {questionsAnswered} questions attempted in 5 minutes
+                {questionsAnswered} questions attempted in 15 minutes
               </p>
-              <button onClick={() => { setPhase('start'); setScore(0); setTotalAttempted(0); setQuestionsAnswered(0); setMasteredIds(new Set()); setStreak(0); setSuperComboActive(false); setSuperComboRemaining(0); setSuperComboScore(0); }} className="btn-soft btn-soft-blue">
-                🏠 Back to Dashboard
-              </button>
+              <div className="flex gap-3 justify-center">
+                <button onClick={() => { setPhase('start'); setScore(0); setTotalAttempted(0); setQuestionsAnswered(0); setMasteredIds(new Set()); setStreak(0); setSuperComboActive(false); setSuperComboRemaining(0); setSuperComboScore(0); setWrongAnswers([]); setShowReview(false); }} className="btn-soft btn-soft-blue">
+                  🏠 Back to Dashboard
+                </button>
+                {wrongAnswers.length > 0 && (
+                  <button onClick={() => setShowReview(!showReview)} className="btn-soft btn-soft-purple">
+                    {showReview ? '🔼 Hide Review' : `📋 Review Mistakes (${wrongAnswers.length})`}
+                  </button>
+                )}
+              </div>
             </div>
+
+            {/* Wrong Answers Review */}
+            <AnimatePresence>
+              {showReview && wrongAnswers.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  className="card-soft"
+                >
+                  <h3 className="text-lg text-red-500 font-bold mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
+                    ❌ Questions You Got Wrong
+                  </h3>
+                  <div className="space-y-3">
+                    {wrongAnswers.map((wa, i) => (
+                      <div key={i} className="bg-red-50 border border-red-200 rounded-xl p-3">
+                        <p className="font-bold text-indigo-600 text-lg mb-1" style={{ fontFamily: 'var(--font-heading)' }}>
+                          {wa.acronym}
+                        </p>
+                        {wa.breakdownWrong && (
+                          <div className="text-sm mb-1">
+                            <span className="text-red-500 line-through">{wa.yourBreakdown}</span>
+                            <span className="text-green-600 font-bold ml-2">✓ {wa.correctBreakdown}</span>
+                          </div>
+                        )}
+                        {wa.meaningWrong && (
+                          <div className="text-sm">
+                            <span className="text-red-500 line-through">{wa.yourMeaning}</span>
+                            <span className="text-green-600 font-bold ml-2">✓ {wa.correctMeaning}</span>
+                          </div>
+                        )}
+                        {!wa.breakdownWrong && !wa.meaningWrong && (
+                          <p className="text-sm text-green-600 font-bold">✓ {wa.correctBreakdown} — {wa.correctMeaning}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Leaderboard */}
             <div className="card-soft">

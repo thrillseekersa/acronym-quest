@@ -55,15 +55,8 @@ export function AuthProvider({ children }) {
 
     const uid = 'user_' + username.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now();
 
-    // Balanced group assignment — assign to the smaller group
-    const allUsers = await getDocs(collection(db, 'users'));
-    let manualCount = 0, gamifiedCount = 0;
-    allUsers.docs.forEach(d => {
-      const g = d.data().studyGroup;
-      if (g === 'Manual') manualCount++;
-      else if (g === 'Gamified') gamifiedCount++;
-    });
-    const studyGroup = manualCount <= gamifiedCount ? 'Manual' : 'Gamified';
+    // Random 50/50 group assignment
+    const studyGroup = Math.random() < 0.5 ? 'Manual' : 'Gamified';
 
     const userDoc = {
       fullName, school, grade, username, password, avatar,

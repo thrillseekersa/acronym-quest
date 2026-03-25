@@ -167,7 +167,7 @@ export default function CountdownScreen({ onComplete }) {
           animate={{ rotate: [0, 5, -5, 0] }}
           transition={{ duration: 3, repeat: Infinity }}
         >
-          🚀
+          📖
         </motion.div>
 
         <h1 className="text-4xl md:text-5xl font-black text-white mb-2"

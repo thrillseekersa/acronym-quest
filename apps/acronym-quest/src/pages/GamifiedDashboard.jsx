@@ -11,8 +11,8 @@ import GroupChat from '../components/GroupChat';
 import { askAI as askAIService } from '../services/ai';
 import Avatar from '../components/Avatar';
 
-const STUDY_TIME = 5 * 60;   // 5 minutes study
-const QUIZ_TIME = 5 * 60;    // 5 minutes quiz
+const STUDY_TIME = 15 * 60;   // 15 minutes study
+const QUIZ_TIME = 15 * 60;    // 15 minutes quiz
 const PREMIUM_AVATARS = [
   { icon: '👽', cost: 10, name: 'Alien' },
   { icon: '👻', cost: 20, name: 'Ghost' },
@@ -190,6 +190,16 @@ export default function GamifiedDashboard() {
   const [showShop, setShowShop] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showSkipSplash, setShowSkipSplash] = useState(false);
+  const [studyLocked, setStudyLocked] = useState(false);
+
+  // Check if already studied today
+  useEffect(() => {
+    if (!userData) return;
+    const today = new Date().toISOString().slice(0, 10);
+    if (userData.lastStudyDate === today) {
+      setStudyLocked(true);
+    }
+  }, [userData?.lastStudyDate]);
 
   // Skip-day detection
   useEffect(() => {
@@ -517,14 +527,17 @@ export default function GamifiedDashboard() {
         timestamp: serverTimestamp()
       });
 
-      // Update user points
+      // Update user points and lock study for the day
       const newPoints = (userData.points || 0) + score;
       const newQuizCount = (userData.quizzesTaken || 0) + 1;
+      const today = new Date().toISOString().slice(0, 10);
       const userRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userRef, {
         points: newPoints,
-        quizzesTaken: newQuizCount
+        quizzesTaken: newQuizCount,
+        lastStudyDate: today
       });
+      setStudyLocked(true);
     } catch (err) {
       console.error('Error saving results:', err);
     }
@@ -606,25 +619,25 @@ export default function GamifiedDashboard() {
             {/* Navigation Buttons */}
             <div className="flex gap-3 justify-center">
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95, y: 3 }}
+                whileHover={!studyLocked ? { scale: 1.05 } : {}}
+                whileTap={!studyLocked ? { scale: 0.95, y: 3 } : {}}
                 onClick={() => { setPhase('study'); setTimer(STUDY_TIME); }}
-                disabled={dailyAcronyms.length === 0}
-                className="nav-btn nav-btn-blue flex-1"
+                disabled={dailyAcronyms.length === 0 || studyLocked}
+                className={`nav-btn nav-btn-blue flex-1 ${studyLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                <div className="nav-btn-icon">📚</div>
-                <span className="font-bold text-sm" style={{ fontFamily: 'var(--font-heading)' }}>Study</span>
+                <div className="nav-btn-icon">{studyLocked ? '🔒' : '📚'}</div>
+                <span className="font-bold text-sm" style={{ fontFamily: 'var(--font-heading)' }}>{studyLocked ? 'Done!' : 'Study'}</span>
               </motion.button>
 
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95, y: 3 }}
+                whileHover={!studyLocked ? { scale: 1.05 } : {}}
+                whileTap={!studyLocked ? { scale: 0.95, y: 3 } : {}}
                 onClick={() => { setPhase('quiz'); setTimer(QUIZ_TIME); generateQuestion(); }}
-                disabled={dailyAcronyms.length === 0}
-                className="nav-btn nav-btn-yellow flex-1"
+                disabled={dailyAcronyms.length === 0 || studyLocked}
+                className={`nav-btn nav-btn-yellow flex-1 ${studyLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                <div className="nav-btn-icon">📝</div>
-                <span className="font-bold text-sm" style={{ fontFamily: 'var(--font-heading)' }}>Quiz</span>
+                <div className="nav-btn-icon">{studyLocked ? '🔒' : '📝'}</div>
+                <span className="font-bold text-sm" style={{ fontFamily: 'var(--font-heading)' }}>{studyLocked ? 'Done!' : 'Quiz'}</span>
               </motion.button>
 
               <motion.button
@@ -650,6 +663,18 @@ export default function GamifiedDashboard() {
               </motion.button>
             </div>
 
+            {/* Daily lockout banner */}
+            {studyLocked && (
+              <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-center">
+                <p className="text-sm text-green-700 font-semibold">
+                  ✅ You've completed today's study session! Come back tomorrow for new words.
+                </p>
+                <p className="text-xs text-green-600 mt-1">
+                  Shop & Chat are still open — spend your points! 🛒💬
+                </p>
+              </div>
+            )}
+
             {/* Today's Info Card */}
             <div className="card-soft text-center py-4">
               <h2 className="text-lg text-indigo-600 mb-1" style={{ fontFamily: 'var(--font-heading)' }}>
@@ -661,12 +686,12 @@ export default function GamifiedDashboard() {
               <div className="flex justify-center gap-4 my-3 text-xs">
                 <div className="bg-cosmic-surface/50 rounded-xl p-2 text-center">
                   <p className="text-cosmic-purple-light font-bold">📚 Study</p>
-                  <p className="text-cosmic-muted">5 min review</p>
+                  <p className="text-cosmic-muted">15 min review</p>
                 </div>
                 <div className="text-cosmic-muted text-xl self-center">→</div>
                 <div className="bg-cosmic-surface/50 rounded-xl p-2 text-center">
                   <p className="text-cosmic-blue font-bold">📝 Quiz</p>
-                  <p className="text-cosmic-muted">5 min rapid-fire</p>
+                  <p className="text-cosmic-muted">15 min rapid-fire</p>
                 </div>
                 <div className="text-cosmic-muted text-xl self-center">→</div>
                 <div className="bg-cosmic-surface/50 rounded-xl p-2 text-center">

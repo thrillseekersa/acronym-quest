@@ -193,6 +193,7 @@ export default function GamifiedDashboard() {
   const [studyLocked, setStudyLocked] = useState(false);
   const [wrongAnswers, setWrongAnswers] = useState([]);
   const [showReview, setShowReview] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   // Check if already studied today
   useEffect(() => {
@@ -676,6 +677,17 @@ export default function GamifiedDashboard() {
                 <div className="nav-btn-icon">💬</div>
                 <span className="font-bold text-sm" style={{ fontFamily: 'var(--font-heading)' }}>Chat</span>
               </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95, y: 3 }}
+                onClick={() => setShowLeaderboard(!showLeaderboard)}
+                className="nav-btn nav-btn-yellow"
+                style={{ minWidth: 80 }}
+              >
+                <div className="nav-btn-icon">🏆</div>
+                <span className="font-bold text-sm" style={{ fontFamily: 'var(--font-heading)' }}>Board</span>
+              </motion.button>
             </div>
 
             {/* Daily lockout banner */}
@@ -720,30 +732,41 @@ export default function GamifiedDashboard() {
             </div>
 
             {/* Leaderboard */}
-            {leaderboard.length > 0 && (
-              <div className="card-soft">
-                <h3 className="text-lg text-indigo-600 font-bold mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
-                  🏆 Today's Leaderboard
-                </h3>
-                <div className="space-y-2">
-                  {leaderboard.map((entry, i) => (
-                    <div key={entry.id} className={`flex items-center gap-3 p-2 rounded-xl ${
-                      entry.username === userData?.username ? 'bg-cosmic-blue/20 border border-cosmic-blue' : 'bg-cosmic-surface/30'
-                    }`}>
-                      <span className="text-2xl font-bold text-indigo-600 w-8 text-center" style={{ fontFamily: 'var(--font-heading)' }}>
-                        {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`}
-                      </span>
-                      <span className="font-bold text-cosmic-text flex-1">
-                        <Avatar avatar={entry.avatar} size={24} className="mr-2" />
-                        {entry.fullName || entry.username}
-                      </span>
-                      <span className="text-cosmic-blue font-bold">{entry.score} ⭐</span>
-                      <span className="text-cosmic-muted text-xs">{entry.questionsAnswered || 0}Q</span>
+            <AnimatePresence>
+              {showLeaderboard && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="card-soft overflow-hidden"
+                >
+                  <h3 className="text-lg text-indigo-600 font-bold mb-3" style={{ fontFamily: 'var(--font-heading)' }}>
+                    🏆 Today's Leaderboard
+                  </h3>
+                  {leaderboard.length === 0 ? (
+                    <p className="text-cosmic-muted text-sm text-center py-4">No scores yet — be the first! 🎉</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {leaderboard.map((entry, i) => (
+                        <div key={entry.id} className={`flex items-center gap-3 p-2 rounded-xl ${
+                          entry.username === userData?.username ? 'bg-cosmic-blue/20 border border-cosmic-blue' : 'bg-cosmic-surface/30'
+                        }`}>
+                          <span className="text-2xl font-bold text-indigo-600 w-8 text-center" style={{ fontFamily: 'var(--font-heading)' }}>
+                            {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`}
+                          </span>
+                          <span className="font-bold text-cosmic-text flex-1">
+                            <Avatar avatar={entry.avatar} size={24} className="mr-2" />
+                            {entry.fullName || entry.username}
+                          </span>
+                          <span className="text-cosmic-blue font-bold">{entry.score} ⭐</span>
+                          <span className="text-cosmic-muted text-xs">{entry.questionsAnswered || 0}Q</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
 
